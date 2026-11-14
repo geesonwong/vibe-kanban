@@ -95,3 +95,7 @@ vibe-kanban-cloud/
 *.ts.net.key
 Caddyfile
 Caddyfile.dev
+
+# ---- 我方本地开发环境（不提交） ----
+.toolchain/
+runtime/

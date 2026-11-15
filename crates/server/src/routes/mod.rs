@@ -13,11 +13,13 @@ pub mod containers;
 pub mod filesystem;
 // pub mod github;
 pub mod attachments;
+pub mod board;
 pub mod events;
 pub mod execution_processes;
 pub mod frontend;
 pub mod health;
 pub mod host_relay;
+pub mod local_auth;
 pub mod oauth;
 pub mod organizations;
 pub mod preview;
@@ -44,6 +46,8 @@ pub fn router(deployment: DeploymentImpl) -> IntoMakeService<Router> {
         .merge(execution_processes::router(&deployment))
         .merge(tags::router(&deployment))
         .merge(oauth::router())
+        .merge(local_auth::router())
+        .merge(board::router())
         .merge(organizations::router())
         .merge(filesystem::router())
         .merge(repo::router())

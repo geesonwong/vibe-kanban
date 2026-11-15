@@ -249,7 +249,11 @@ export function SharedAppLayout() {
   );
 
   const handleCreateProject = useCallback(async () => {
-    if (!selectedOrgId) return;
+    // 本地部署没有组织（云端已关闭）：直接跳到本地看板的项目页，那里可新建项目。
+    if (!selectedOrgId) {
+      window.location.assign('/board');
+      return;
+    }
 
     try {
       const result: CreateRemoteProjectResult =

@@ -16,10 +16,12 @@ export interface LocalAuthStatus {
   user: LocalUser | null;
 }
 
+/** 看板列 = 可配置状态 */
 export interface BoardColumn {
   id: string;
   name: string;
   color: string;
+  position: number;
 }
 
 export interface BoardProject {
@@ -33,9 +35,9 @@ export interface BoardProject {
 export interface BoardIssue {
   id: string;
   project_id: string;
+  column_id: string | null;
   title: string;
   description: string | null;
-  status: string;
   created_at: string;
   updated_at: string;
 }
@@ -45,6 +47,17 @@ export interface BoardView {
   columns: BoardColumn[];
   issues: BoardIssue[];
 }
+
+/** 列配色可选值（与后端 ALLOWED_COLORS 对齐） */
+export const COLUMN_COLORS = [
+  'gray',
+  'blue',
+  'violet',
+  'green',
+  'rose',
+  'amber',
+  'teal',
+] as const;
 
 const BASE = '/api';
 
@@ -118,9 +131,10 @@ export const boardApi = {
   getBoard: (projectId: string) =>
     request<BoardView>(`/board/projects/${projectId}`),
 
+  // --- 任务卡 ---
   createIssue: (
     projectId: string,
-    payload: { title: string; description?: string; status?: string }
+    payload: { title: string; description?: string; column_id?: string }
   ) =>
     request<BoardIssue>(`/board/projects/${projectId}/issues`, {
       method: 'POST',
@@ -129,7 +143,7 @@ export const boardApi = {
 
   updateIssue: (
     issueId: string,
-    payload: { title?: string; description?: string; status?: string }
+    payload: { title?: string; description?: string; column_id?: string }
   ) =>
     request<BoardIssue>(`/board/issues/${issueId}`, {
       method: 'PATCH',
@@ -138,4 +152,26 @@ export const boardApi = {
 
   deleteIssue: (issueId: string) =>
     request<void>(`/board/issues/${issueId}`, { method: 'DELETE' }),
+
+  // --- 列（状态）---
+  createColumn: (
+    projectId: string,
+    payload: { name: string; color?: string }
+  ) =>
+    request<BoardColumn>(`/board/projects/${projectId}/columns`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateColumn: (
+    columnId: string,
+    payload: { name?: string; color?: string; position?: number }
+  ) =>
+    request<BoardColumn>(`/board/columns/${columnId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  deleteColumn: (columnId: string) =>
+    request<void>(`/board/columns/${columnId}`, { method: 'DELETE' }),
 };
